@@ -23,16 +23,17 @@ typedef struct queue{
 bool is_empty(const queue* que);
 bool is_full(const queue* que);
 
-// 새로운 큐 만드는 함수
-queue* new_queue() {
+// 새로운 큐 만드는 함수 (매개변수로 큐의 최대 크기를 받음)
+queue* new_queue(int max_size) {
     queue* que = malloc(sizeof(queue));
     if (que == NULL) {
         printf("Not enough memory");
         exit(EXIT_FAILURE);
     }
     que->size = 0;      // 큐의 크기 0으로 초기화
-    que->front = NULL;     // 큐의 첫 요소 
+    que->front = NULL;     // 큐의 첫 요소 (NULL 대입은 비어있는 포인터라는 뜻)
     que->rear = NULL;
+    que->max_size = max_size;   // 큐의 최대 크기 초기화
     return que;
 }
 
@@ -48,10 +49,6 @@ node* new_node(const char data){
     return another;
 }
 
-// head 노드, tail 노드의 주소 초기화
-node* front = 0;
-node* rear = 0;
-
 // 큐에 새 노드 추가 (큐는 새로 들어온 노드가 뒤에 추가됨 - rear에 추가)
 void enqueue(queue* que, int x){     
     node* newnode = new_node(x);    // 새 노드 생성, 데이터 추가
@@ -62,16 +59,16 @@ void enqueue(queue* que, int x){
     else{                           // 비어있지 않은 큐인 경우
         que->rear->next = newnode;       
         que->rear = newnode;
-        que->size += 1;
     }
+    que->size += 1;     // 큐의 크기 증가 - 큐가 비어있을 때에도 늘어남
 }
 
 // 큐에서 노드 삭제 (큐는 먼저 들어온 순서대로 삭제됨 - front 노드 삭제)
 void dequeue(queue* que){
-    node* temp;     // 이동 위한 임시 노드
-    temp = que->front;   // temp 노드가 맨 앞을 가리키게 설정
+    node* temp = que->front;   // 이동 위한 임시 노드 temp가 맨 앞을 가리키게 함
     if (is_empty(que)){       // 큐가 비어있는 경우
         printf("Queue is empty");
+        que->front = que->rear = NULL;   // front와 rear를 다시 NULL로 초기화
         return;
     }
     else{                               // 큐가 비어있지 않은 경우
@@ -83,7 +80,11 @@ void dequeue(queue* que){
 
 // 큐가 비어있는지 알려주는 함수
 bool is_empty(const queue* que){
-    return que->front == NULL && que->rear == NULL;
+    if (que == NULL){   // 비어있는 큐인 경우
+        printf("유효하지 않은 큐!");
+        return true;
+    }
+        return que->front == NULL;  // 한쪽만 검사 (큐가 비어 있을 때는 front, back 둘 다 null)
 }
 
 // 큐가 가득 차 있는지 알려주는 함수
@@ -145,17 +146,16 @@ void clear_queue(queue** que){
 }
 
 // 마지막 값을 바꾸는 함수
-void replace_rear(const queue* que, const char target){
+void replace_rear(queue* que, const char target){
     if(is_empty(que)) return;
     que->rear->data = target;
 }
 
 int main() {
-    // 새로운 큐 생성, 최대 크기를 3으로 가정
-    queue* myQueue = new_queue();
-    myQueue->max_size = 3;
+    // 큐 생성
+    queue* myQueue = new_queue(5);
 
-    // 큐에 노드 추가
+    // 큐에 데이터 추가
     enqueue(myQueue, 'A');
     enqueue(myQueue, 'B');
     enqueue(myQueue, 'C');
@@ -165,30 +165,7 @@ int main() {
     display(myQueue);
     printf("\n");
 
-    // 큐가 가득 차 있는지 확인
-    if (is_full(myQueue)) {
-        printf("Queue is full.\n");
-    } else {
-        printf("Queue is not full.\n");
-    }
-
-    // 큐의 맨 앞 요소 출력
-    printf("Front element of the queue: ");
-    peek(myQueue);
-    printf("\n");
-
-    // 큐의 크기 출력
-    printf("Size of the queue: %d\n", size(myQueue));
-
-    // 'B'가 큐 안에 있는지 확인
-    char target = 'B';
-    if (is_member(myQueue, target)) {
-        printf("%c is in the queue.\n", target);
-    } else {
-        printf("%c is not in the queue.\n", target);
-    }
-
-    // 큐에서 노드 삭제
+    // 큐에서 데이터 제거
     dequeue(myQueue);
 
     // 큐의 상태 출력
@@ -196,21 +173,29 @@ int main() {
     display(myQueue);
     printf("\n");
 
-    // 마지막 값 'C'를 'X'로 변경
-    char newTarget = 'X';
-    replace_rear(myQueue, newTarget);
-    printf("Queue after replacing the last element: ");
+    // 큐의 front 요소 출력
+    printf("Front element: ");
+    peek(myQueue);
+    printf("\n");
+
+    // 큐의 사이즈 출력
+    printf("Queue size: %d\n", size(myQueue));
+
+    // 특정 값이 큐에 있는지 확인
+    char target = 'B';
+    if (is_member(myQueue, target)) {
+        printf("%c is in the queue.\n", target);
+    } else {
+        printf("%c is not in the queue.\n", target);
+    }
+
+    // 큐의 rear 값을 변경하고 출력
+    replace_rear(myQueue, 'X');
+    printf("Queue after replacing rear: ");
     display(myQueue);
     printf("\n");
 
-    // 큐가 가득 차 있는지 확인
-    if (is_full(myQueue)) {
-        printf("Queue is full.\n");
-    } else {
-        printf("Queue is not full.\n");
-    }
-
-    // 큐 삭제
+    // 큐 비우기
     clear_queue(&myQueue);
 
     return 0;
