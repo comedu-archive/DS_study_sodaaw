@@ -153,12 +153,13 @@ void replace_rear(queue* que, const char target){
 
 int main() {
     // 큐 생성
-    queue* myQueue = new_queue(5);
+    queue* myQueue = new_queue(3);
 
     // 큐에 데이터 추가
     enqueue(myQueue, 'A');
     enqueue(myQueue, 'B');
     enqueue(myQueue, 'C');
+    enqueue(myQueue, 'D');
 
     // 큐의 상태 출력
     printf("Queue after enqueuing: ");
