@@ -1,5 +1,4 @@
 // 연결리스트를 활용한 큐 구현
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,24 +15,24 @@ typedef struct queue{
     node* front;
     node* rear;
     int size;
-    int max_size;   // 큐의 최대 크기
+    int max_size;   
 }queue;
 
 // 함수 사용 전 선언
 bool is_empty(const queue* que);
 bool is_full(const queue* que);
 
-// 새로운 큐 만드는 함수 (매개변수로 큐의 최대 크기를 받음)
+// 새로운 큐를 만드는 함수 
 queue* new_queue(int max_size) {
     queue* que = malloc(sizeof(queue));
     if (que == NULL) {
         printf("Not enough memory");
         exit(EXIT_FAILURE);
     }
-    que->size = 0;      // 큐의 크기 0으로 초기화
-    que->front = NULL;     // 큐의 첫 요소 (NULL 대입은 비어있는 포인터라는 뜻)
-    que->rear = NULL;
-    que->max_size = max_size;   // 큐의 최대 크기 초기화
+    que->size = 0;      
+    que->front = NULL;      
+    que->rear = NULL;       
+    que->max_size = max_size;   
     return que;
 }
 
@@ -49,8 +48,12 @@ node* new_node(const char data){
     return another;
 }
 
-// 큐에 새 노드 추가 (큐는 새로 들어온 노드가 뒤에 추가됨 - rear에 추가)
-void enqueue(queue* que, int x){     
+// 큐에 새 노드 추가 
+void queue_enqueue(queue* que, const int x){  
+    if (is_full(que)) {
+        printf("Queue is full");
+        return;
+    }   
     node* newnode = new_node(x);    // 새 노드 생성, 데이터 추가
     
     if(is_empty(que)){    // 비어있는 큐인 경우
@@ -60,31 +63,32 @@ void enqueue(queue* que, int x){
         que->rear->next = newnode;       
         que->rear = newnode;
     }
-    que->size += 1;     // 큐의 크기 증가 - 큐가 비어있을 때에도 늘어남
+    que->size += 1;     // 큐의 크기 증가
 }
 
-// 큐에서 노드 삭제 (큐는 먼저 들어온 순서대로 삭제됨 - front 노드 삭제)
-void dequeue(queue* que){
+// 큐에서 노드 삭제 
+void queue_dequeue(queue* que){
     node* temp = que->front;   // 이동 위한 임시 노드 temp가 맨 앞을 가리키게 함
-    if (is_empty(que)){       // 큐가 비어있는 경우
+    if (is_empty(que)){       
         printf("Queue is empty");
         que->front = que->rear = NULL;   // front와 rear를 다시 NULL로 초기화
-        return;
+        return -1;
     }
-    else{                               // 큐가 비어있지 않은 경우
+    else{                              
         que->front = que->front->next;
         free(temp);
         que->size -= 1;
+        return 0;
     }
 }
 
 // 큐가 비어있는지 알려주는 함수
 bool is_empty(const queue* que){
-    if (que == NULL){   // 비어있는 큐인 경우
+    if (que == NULL){  
         printf("유효하지 않은 큐!");
         return true;
     }
-        return que->front == NULL;  // 한쪽만 검사 (큐가 비어 있을 때는 front, back 둘 다 null)
+        return que->front == NULL;  // 한쪽만 검사
 }
 
 // 큐가 가득 차 있는지 알려주는 함수
@@ -128,17 +132,19 @@ bool is_member(const queue* que, const char target){
     if(is_empty(que)) return false;
 
     node* temp = que->front;    // temp 노드에 맨 앞 주소 저장
-    while (temp != 0) {         // 끝 부분까지 실행
+    while (temp != 0) {        
         if (temp->data == target) break;    // 원하는 문자를 찾은 경우
         else temp = temp->next;             // 찾지 못한 경우 다음 노드로 이동
     }
 
-    if (temp) return true;      // null이 아닌 모든 값은 true 취급
+    if (temp) return true;     
     return false;               // 찾지 못했을 경우
 }
 
 // 다 쓴 큐를 삭제하는 함수
 void clear_queue(queue** que){
+    if (que==NULL || que*==NULL)
+        return;
     while(!is_empty(*que))
         dequeue(*que);
     free(*que);
@@ -147,8 +153,9 @@ void clear_queue(queue** que){
 
 // 마지막 값을 바꾸는 함수
 void replace_rear(queue* que, const char target){
-    if(is_empty(que)) return;
+    if(is_empty(que)) return-1;
     que->rear->data = target;
+    return 0;
 }
 
 int main() {
@@ -159,7 +166,6 @@ int main() {
     enqueue(myQueue, 'A');
     enqueue(myQueue, 'B');
     enqueue(myQueue, 'C');
-    enqueue(myQueue, 'D');
 
     // 큐의 상태 출력
     printf("Queue after enqueuing: ");
@@ -171,6 +177,20 @@ int main() {
 
     // 큐의 상태 출력
     printf("Queue after dequeuing: ");
+    display(myQueue);
+    printf("\n");
+
+    // 큐에 이미 비어 있는 상태에서 dequeue 시도
+    printf("Attempting to dequeue from an empty queue: ");
+    dequeue(myQueue);
+    display(myQueue);
+    printf("\n");
+
+    // 큐가 가득 찬 상태에서 enqueue 시도
+    printf("Attempting to enqueue to a full queue: ");
+    enqueue(myQueue, 'X');
+    enqueue(myQueue, 'Y');
+    enqueue(myQueue, 'Z');
     display(myQueue);
     printf("\n");
 
