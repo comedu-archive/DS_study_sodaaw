@@ -67,7 +67,7 @@ void queue_enqueue(queue* que, const int x){
 }
 
 // 큐에서 노드 삭제 
-void queue_dequeue(queue* que){
+int queue_dequeue(queue* que){
     node* temp = que->front;   // 이동 위한 임시 노드 temp가 맨 앞을 가리키게 함
     if (is_empty(que)){       
         printf("Queue is empty");
@@ -143,17 +143,17 @@ bool is_member(const queue* que, const char target){
 
 // 다 쓴 큐를 삭제하는 함수
 void clear_queue(queue** que){
-    if (que==NULL || que*==NULL)
+    if (que==NULL || *que==NULL)
         return;
     while(!is_empty(*que))
-        dequeue(*que);
+        queue_dequeue(*que);
     free(*que);
     *que = NULL;
 }
 
 // 마지막 값을 바꾸는 함수
-void replace_rear(queue* que, const char target){
-    if(is_empty(que)) return-1;
+int replace_rear(queue* que, const char target){
+    if(is_empty(que)) return -1;
     que->rear->data = target;
     return 0;
 }
@@ -163,9 +163,9 @@ int main() {
     queue* myQueue = new_queue(3);
 
     // 큐에 데이터 추가
-    enqueue(myQueue, 'A');
-    enqueue(myQueue, 'B');
-    enqueue(myQueue, 'C');
+    queue_enqueue(myQueue, 'A');
+    queue_enqueue(myQueue, 'B');
+    queue_enqueue(myQueue, 'C');
 
     // 큐의 상태 출력
     printf("Queue after enqueuing: ");
@@ -173,7 +173,7 @@ int main() {
     printf("\n");
 
     // 큐에서 데이터 제거
-    dequeue(myQueue);
+    queue_dequeue(myQueue);
 
     // 큐의 상태 출력
     printf("Queue after dequeuing: ");
@@ -182,15 +182,15 @@ int main() {
 
     // 큐에 이미 비어 있는 상태에서 dequeue 시도
     printf("Attempting to dequeue from an empty queue: ");
-    dequeue(myQueue);
+    queue_dequeue(myQueue);
     display(myQueue);
     printf("\n");
 
     // 큐가 가득 찬 상태에서 enqueue 시도
     printf("Attempting to enqueue to a full queue: ");
-    enqueue(myQueue, 'X');
-    enqueue(myQueue, 'Y');
-    enqueue(myQueue, 'Z');
+    queue_enqueue(myQueue, 'X');
+    queue_enqueue(myQueue, 'Y');
+    queue_enqueue(myQueue, 'Z');
     display(myQueue);
     printf("\n");
 
