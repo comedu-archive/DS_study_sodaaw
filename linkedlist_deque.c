@@ -1,5 +1,4 @@
 // 양방향 연결리스트를 활용한 덱 구현
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,7 +23,7 @@ typedef struct deque{
 bool is_empty(const deque* deq);
 bool is_full(const deque* deq);
 
-// 새로운 덱 만드는 함수 (매개변수로 덱의 최대 크기를 받음)
+// 새로운 덱 만드는 함수 
 deque* new_deque(int max_size) {
     deque* deq = malloc(sizeof(deque));
     if (deq == NULL) {
@@ -32,8 +31,8 @@ deque* new_deque(int max_size) {
         exit(EXIT_FAILURE);
     }
     deq->size = 0;      // 덱의 크기 0으로 초기화
-    deq->front = NULL;     // 덱의 첫 요소 (NULL 대입은 비어있는 포인터라는 뜻)
-    deq->rear = NULL;
+    deq->front = NULL;      // 덱의 첫 요소 
+    deq->rear = NULL;       // 덱의 마지막 요소
     deq->max_size = max_size;   // 덱의 최대 크기 초기화
     return deq;
 }
@@ -47,7 +46,7 @@ node* new_node(const char data){
     }
     another->data = data;
     another->next = NULL;
-    another->prev = NULL;   // prev도 NULL 저장
+    another->prev = NULL;  
     return another;
 }
 
@@ -58,6 +57,11 @@ void enqueue_front(deque* deq, const char data){
         exit(EXIT_FAILURE);
     }
     node* newnode = new_node(data);     // 새로운 덱 생성, 데이터 추가
+    if (is_full(deq)) {     // 덱이 가득 찬 경우
+        printf("덱이 가득 찼습니다");
+        free(newnode);
+        return;
+    }
     if (is_empty(deq)) {    // 덱이 빈 경우 앞뒤에 새 노드의 주소 저장
         deq->front = deq->rear = newnode;
     }
@@ -71,9 +75,13 @@ void enqueue_front(deque* deq, const char data){
 
 // 2. 덱의 앞 부분에서 노드 삭제
 void dequeue_front(deque* deq){
-    if (deq == NULL){   // 예외처리: 덱이 유효하지 않은 경우
+    if (deq == NULL){   
         printf("유효하지 않은 덱");
         exit(EXIT_FAILURE);
+    }
+    if (is_empty(deq)){
+        printf("비어 있는 덱");
+        return;
     }
     node* temp = deq->front;    // 이동 위한 임시 노드 temp
     if(deq->front == deq->rear){    // 덱에 노드가 하나 있는 경우
@@ -90,11 +98,16 @@ void dequeue_front(deque* deq){
 
 // 3. 덱의 뒷 부분에 새 노드 추가
 void enqueue_rear(deque* deq, const char data){
-    if (deq == NULL){   // 예외처리: 덱이 유효하지 않은 경우
+    if (deq == NULL){   
         printf("유효하지 않은 덱");
         exit(EXIT_FAILURE);
     }
     node* newnode = new_node(data);     // 새로운 덱 생성, 데이터 추가
+    if (is_full(deq)) {     // 덱이 가득 찬 경우
+        printf("덱이 가득 찼습니다");
+        free(newnode);
+        return;
+    }
     if (is_empty(deq)) {    // 덱이 빈 경우 앞뒤에 새 노드의 주소 저장
         deq->front = deq->rear = newnode;
     }
@@ -108,9 +121,13 @@ void enqueue_rear(deque* deq, const char data){
 
 // 4. 덱의 뒷 부분에서 노드 삭제
 void dequeue_rear(deque* deq){
-    if (deq == NULL){   // 예외처리: 덱이 유효하지 않은 경우
+    if (deq == NULL){   
         printf("유효하지 않은 덱");
         exit(EXIT_FAILURE);
+    }
+    if (is_empty(deq)) {
+        printf("비어 있는 덱");
+        return;
     }
     node* temp = deq->rear;    // 이동 위한 임시 노드 temp
     if(deq->front == deq->rear){    // 덱에 노드가 하나 있는 경우
@@ -146,7 +163,7 @@ void display(deque *deq){
     }
     else{
         temp = deq->front;       // temp 노드가 맨 앞을 가리키게 설정
-        while(temp != 0){   // 맨 끝까지 진행
+        while(temp != 0){   
             printf("%c", temp->data);   // 노드의 데이터 출력
             temp = temp->next;          // 다음 노드로 이동
         }
@@ -174,9 +191,9 @@ bool is_member(const deque* deq, const char target){
     if(is_empty(deq)) return false;
 
     node* temp = deq->front;    // temp 노드에 맨 앞 주소 저장
-    while (temp != 0) {         // 끝 부분까지 실행
-        if (temp->data == target) break;    // 원하는 문자를 찾은 경우
-        else temp = temp->next;             // 찾지 못한 경우 다음 노드로 이동
+    while (temp != NULL) {        
+        if (temp->data == target) return true;    // 원하는 문자를 찾은 경우
+        temp = temp->next;             // 찾지 못한 경우 다음 노드로 이동
     }
 
     if (temp) return true;      // null이 아닌 모든 값은 true 취급
@@ -244,7 +261,7 @@ int main() {
     printf("Deque after replacing rear element: ");
     display(myDeque);
     printf("\n");
-
+ 
     // 특정 값이 덱에 존재하는지 확인
     char target = 'D';
     if (is_member(myDeque, target)) {
